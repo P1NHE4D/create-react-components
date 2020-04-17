@@ -8,12 +8,29 @@ const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 
 export async function generateReactComponent() {
-  const input = await prompt({ name: 'tagName', type: 'text', message: 'input name' });
+  const name: string = (await prompt({ name: 'componentName', type: 'text', message: 'Component name:' })).componentName as string;
 
+  // TODO: Validate name - must not be an empty string
+  
   const base: Extension = await chooseBase();
+  
+  const stylesheet: Extension = await chooseStylesheet();
 
-  const filesToGenerate: Extension[] = await chooseFilesToGenerate(base);
+  const filesToGenerate: Extension[] = [base, ...(await chooseFilesToGenerate(base, stylesheet))];
 }
+
+const chooseStylesheet = async () => (
+    await prompt({
+        name: 'stylesheet',
+        type: 'select',
+        message: 'Pick stylesheet',
+        choices: [
+            { title: 'css', value: 'css'},
+            { title: 'scss', value: 'scss'},
+            { title: 'sass', value: 'sass'}
+        ],
+    })
+).stylesheet as Extension;
 
 const chooseBase = async () =>
   (
@@ -28,16 +45,15 @@ const chooseBase = async () =>
     })
   ).base as Extension;
 
-const chooseFilesToGenerate = async (base: Extension) =>
+const chooseFilesToGenerate = async (base: Extension, stylesheet: Extension) =>
   (
     await prompt({
       name: 'filesToGenerate',
       type: 'multiselect',
-      message: 'which files would you like to generate?',
+      message: 'Which files would you like to generate?',
       choices: [
-        { value: 'css', title: 'Stylesheet (.css)', selected: true },
-        { value: 'scss', title: 'Scss Stylesheet (.scss)', selected: true },
-        { value: `test.${base}`, title: `React test (.test.${base})`, selected: true },
+        { value: `${stylesheet}`, title: `Stylesheet (.${stylesheet})`, selected: true },
+        { value: `test.${base}`, title: `Tests (.test.${base})`, selected: true },
       ] as any[],
     })
   ).filesToGenerate as Extension[];
@@ -61,6 +77,8 @@ const getBoilerplateByExtension = (tagName: string, extension: Extension) => {
       return;
     case 'scss':
       return;
+    case 'sass':
+      return;
     case 'test.jsx':
       return;
     case 'test.tsx':
@@ -70,4 +88,4 @@ const getBoilerplateByExtension = (tagName: string, extension: Extension) => {
   }
 };
 
-type Extension = 'jsx' | 'tsx' | 'css' | 'scss' | 'test.jsx' | 'test.tsx';
+type Extension = 'jsx' | 'tsx' | 'css' | 'scss' | 'sass' | 'test.jsx' | 'test.tsx';
