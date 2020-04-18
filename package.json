@@ -23,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "gitlink"
+    "url": "https://github.com/P1NHE4D/build-react-component.git"
   },
   "keywords": [
     "react",
@@ -33,9 +33,9 @@
   "author": "Alexander Gerlach",
   "license": "ISC",
   "bugs": {
-    "url": "gitlink"
+    "url": "https://github.com/P1NHE4D/build-react-component.git"
   },
-  "homepage": "gitlink",
+  "homepage": "https://github.com/P1NHE4D/build-react-component.git",
   "dependencies": {
     "commander": "^5.0.0",
     "exit": "^0.1.2",
