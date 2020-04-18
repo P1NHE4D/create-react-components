@@ -1,19 +1,16 @@
 #!/usr/bin/env node
 
-import program from 'commander';
+import program, {Option} from 'commander';
 import path from 'path';
 import { generateReactComponent } from './generate';
 
 program
+    .arguments('[components...]')
     .version('1.0.0')
     .description('Easily generate react components')
-    .option('-p, --path', 'specify components directory')
+    .option('-p, --path <componentsPath>', 'specify components directory', '')
     .option('-t, --no-template', 'disable default component template')
-    .action(async (options: any) => {
-      await generateReactComponent();
+    .action(async (components: string[]) => {
+        await generateReactComponent(components);
     })
     .parse(process.argv);
-
-const populateConfigFile = async (options: any) => {
-    return;
-};

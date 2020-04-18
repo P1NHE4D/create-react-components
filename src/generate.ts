@@ -4,20 +4,23 @@ import { promisify } from 'util';
 import prompt from 'prompts';
 import exit from 'exit';
 import {getComponentBoilerplate, getTestBoilerplate} from "./boilerplates";
+import {Option} from "commander";
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 
-export async function generateReactComponent() {
-    const name: string = (await prompt({ 
-        name: 'componentName', 
-        type: 'text', 
-        message: 'Enter component name:',
-        validate: validateInput,
-        onState: handleState
-    })).componentName as string;
+export async function generateReactComponent(components: string[]) {
     
-    const {dir, base: componentName} = parse(name);
+    if (components.length === 0) {
+        components = (await prompt({
+            name: 'components',
+            type: 'text',
+            message: 'Enter component name(s):',
+            format: formatInput,
+            validate: validateInput,
+            onState: handleState
+        })).components as string[];
+    }
 
     const language: Extension = await chooseLanguage();
 
@@ -29,14 +32,16 @@ export async function generateReactComponent() {
        return ( file === 'css' || file === 'scss' || file === 'sass');
     });
     
-    const outDir = join('components', dir, componentName);
-    await mkdir(outDir, { recursive: true} );
+    for(let component of components) {
+        const outDir = join('components', component);
+        await mkdir(outDir, { recursive: true} );
 
-    const writtenFiles = await Promise.all(
-        filesToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, stylesheetSelected ? stylesheet : undefined)));
-        
-    if (!writtenFiles) {
-        return exit(-1);
+        const writtenFiles = await Promise.all(
+            filesToGenerate.map(extension => writeFileByExtension(outDir, component, extension, stylesheetSelected ? stylesheet : undefined)));
+
+        if (!writtenFiles) {
+            return exit(-1);
+        }
     }
     
     console.log();
@@ -111,6 +116,10 @@ const getBoilerplateByExtension = (componentName: string, extension: Extension, 
         default:
             return '';
     }
+};
+
+const formatInput = (val: string) => {
+    return val.split(' ');
 };
 
 const handleState = (state: any) => {
