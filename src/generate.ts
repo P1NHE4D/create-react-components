@@ -4,7 +4,6 @@ import { promisify } from 'util';
 import prompt from 'prompts';
 import exit from 'exit';
 import {getComponentBoilerplate, getTestBoilerplate} from "./boilerplates";
-import {Option} from "commander";
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
@@ -20,6 +19,12 @@ export async function generateReactComponent(options: {[key: string]: any}, comp
             validate: validateInput,
             onState: handleState
         })).components as string[];
+    } else {
+        const inputValid: string | boolean = validateInput(components.join(' '));
+        if(typeof inputValid === "string") {
+            console.log(inputValid);
+            exit(-1);
+        }
     }
 
     const language: Extension = await chooseLanguage();
@@ -46,8 +51,7 @@ export async function generateReactComponent(options: {[key: string]: any}, comp
         }
     }
     
-    console.log();
-    console.log(`The following files have been generated:`);
+    console.log(`\nThe following files have been generated:`);
 }
 
 const chooseLanguage = async () =>
@@ -141,6 +145,10 @@ const validateInput = (input: string) => {
     //TODO: check, if file already exists
     if(input.trim() === '') {
         return "Name of component may not be empty!";
+    }
+    const names: string[] = input.trim().split(' ');
+    if (new Set(names).size !== names.length) {
+        return "Duplicates not allowed!";
     }
     return true;
 };
