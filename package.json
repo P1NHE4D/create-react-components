@@ -37,7 +37,10 @@
   },
   "homepage": "gitlink",
   "dependencies": {
-    "commander": "^5.0.0"
+    "commander": "^5.0.0",
+    "exit": "^0.1.2",
+    "graceful-fs": "^4.2.3",
+    "prompts": "^2.3.2"
   },
   "devDependencies": {
     "@types/exit": "^0.1.31",
@@ -45,11 +48,8 @@
     "@types/jest": "^25.2.1",
     "@types/node": "^13.11.1",
     "@types/prompts": "^2.0.5",
-    "exit": "^0.1.2",
-    "graceful-fs": "^4.2.3",
     "jest": "^25.3.0",
     "prettier": "^2.0.4",
-    "prompts": "^2.3.2",
     "ts-jest": "^25.4.0",
     "ts-node": "^8.8.2",
     "tslint": "^6.1.1",

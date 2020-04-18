@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import program, {Option} from 'commander';
+import program from 'commander';
 import path from 'path';
 import { generateReactComponent } from './generate';
 
