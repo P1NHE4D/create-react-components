@@ -1,10 +1,10 @@
 {
   "name": "react-component-generator",
   "version": "1.0.0",
-  "description": "With the react-component-generator you can easily generate new react components. This generator also allows you to choose between Typescript and Javascript.",
+  "description": "Allows you to easily generate new react components. Features: - Typescript and Javascript support - SCSS, SASS, and CSS support - Multiple component generation - Support for custom component templates",
   "main": "./src/index.js",
   "bin": {
-    "generate-react-component": "./lib/index.js"
+    "build-react-component": "./lib/index.js"
   },
   "scripts": {
     "build": "tsc",

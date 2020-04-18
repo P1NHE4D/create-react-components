@@ -9,7 +9,7 @@ const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 
 export async function generateReactComponent(options: { [key: string]: any }, components: string[]) {
-    const outDir = 'components'; //TODO: set to user defined directory if set
+    const dir = 'components'; // TODO: set to user defined directory if set
     if (components.length === 0) {
         components = (
             await prompt({
@@ -18,13 +18,13 @@ export async function generateReactComponent(options: { [key: string]: any }, co
                 message: 'Enter component name(s):',
                 format: formatInput,
                 validate: (input) => {
-                    return validateInput(input, outDir);
+                    return validateInput(input, dir);
                 },
                 onState: handleState,
             })
         ).components as string[];
     } else {
-        const inputValid: string | boolean = await validateInput(components.join(' '), outDir);
+        const inputValid: string | boolean = await validateInput(components.join(' '), dir);
         if (typeof inputValid === 'string') {
             console.log(inputValid);
             exit(-1);
@@ -45,7 +45,7 @@ export async function generateReactComponent(options: { [key: string]: any }, co
         const componentName = component.trim();
         const outDir = join('components', componentName);
         await mkdir(outDir, { recursive: true });
-        
+
         const createTemplates = options.template !== undefined ? options.template : true;
 
         const writtenFiles = await Promise.all(
@@ -68,7 +68,6 @@ export async function generateReactComponent(options: { [key: string]: any }, co
     console.log(`\nThe following files have been generated:`);
 }
 
-
 const chooseLanguage = async () =>
     (
         await prompt({
@@ -83,7 +82,6 @@ const chooseLanguage = async () =>
             onState: handleState,
         })
     ).language as Extension;
-
 
 const chooseStylesheet = async () =>
     (
@@ -100,7 +98,6 @@ const chooseStylesheet = async () =>
             onState: handleState,
         })
     ).stylesheet as Extension;
-
 
 const chooseFilesToGenerate = async (language: Extension, stylesheet: Extension) =>
     (
@@ -120,7 +117,6 @@ const chooseFilesToGenerate = async (language: Extension, stylesheet: Extension)
             onState: handleState,
         })
     ).filesToGenerate as Extension[];
-
 
 const writeFileByExtension = async (
     path: string,
@@ -143,7 +139,6 @@ const writeFileByExtension = async (
     return outFile;
 };
 
-
 const getTemplateByExtension = (componentName: string, extension: Extension, stylesheet?: Extension) => {
     switch (extension) {
         case 'jsx':
@@ -159,19 +154,16 @@ const getTemplateByExtension = (componentName: string, extension: Extension, sty
     }
 };
 
-
 const formatInput = (val: string) => {
     val = val.trim();
     return val.split(' ');
 };
-
 
 const handleState = (state: any) => {
     if (state.aborted) {
         exit(-1);
     }
 };
-
 
 const validateInput = (input: string, outDir: string) => {
     if (input.trim() === '') {
