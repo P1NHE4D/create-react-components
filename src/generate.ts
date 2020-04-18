@@ -1,27 +1,31 @@
 import fs from 'graceful-fs';
-import { join, parse, relative } from 'path';
+import path, { join, parse, relative } from 'path';
 import { promisify } from 'util';
 import prompt from 'prompts';
 import exit from 'exit';
-import {getComponentBoilerplate, getTestBoilerplate} from "./boilerplates";
+import { getComponentTemplate, getTestTemplate } from './template';
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 
-export async function generateReactComponent(options: {[key: string]: any}, components: string[]) {
-    
+export async function generateReactComponent(options: { [key: string]: any }, components: string[]) {
+    const outDir = 'components'; //TODO: set to user defined directory if set
     if (components.length === 0) {
-        components = (await prompt({
-            name: 'components',
-            type: 'text',
-            message: 'Enter component name(s):',
-            format: formatInput,
-            validate: validateInput,
-            onState: handleState
-        })).components as string[];
+        components = (
+            await prompt({
+                name: 'components',
+                type: 'text',
+                message: 'Enter component name(s):',
+                format: formatInput,
+                validate: (input) => {
+                    return validateInput(input, outDir);
+                },
+                onState: handleState,
+            })
+        ).components as string[];
     } else {
-        const inputValid: string | boolean = validateInput(components.join(' '));
-        if(typeof inputValid === "string") {
+        const inputValid: string | boolean = await validateInput(components.join(' '), outDir);
+        if (typeof inputValid === 'string') {
             console.log(inputValid);
             exit(-1);
         }
@@ -32,27 +36,38 @@ export async function generateReactComponent(options: {[key: string]: any}, comp
     const stylesheet: Extension = await chooseStylesheet();
 
     const filesToGenerate: Extension[] = [...(await chooseFilesToGenerate(language, stylesheet))];
-    
+
     const stylesheetSelected: boolean = filesToGenerate.some((file: string) => {
-       return ( file === 'css' || file === 'scss' || file === 'sass');
+        return file === 'css' || file === 'scss' || file === 'sass';
     });
-    
-    for(let component of components) {
+
+    for (const component of components) {
         const componentName = component.trim();
         const outDir = join('components', componentName);
-        await mkdir(outDir, { recursive: true} );
-        const createTemplates = options['template'] !== undefined ? options['template'] : true;
+        await mkdir(outDir, { recursive: true });
+        
+        const createTemplates = options.template !== undefined ? options.template : true;
 
         const writtenFiles = await Promise.all(
-            filesToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, createTemplates, stylesheetSelected ? stylesheet : undefined)));
+            filesToGenerate.map((extension) =>
+                writeFileByExtension(
+                    outDir,
+                    componentName,
+                    extension,
+                    createTemplates,
+                    stylesheetSelected ? stylesheet : undefined,
+                ),
+            ),
+        );
 
         if (!writtenFiles) {
             return exit(-1);
         }
     }
-    
+
     console.log(`\nThe following files have been generated:`);
 }
+
 
 const chooseLanguage = async () =>
     (
@@ -65,9 +80,10 @@ const chooseLanguage = async () =>
                 { title: 'TypeScript (.tsx)', value: 'tsx' },
             ],
             initial: 1,
-            onState: handleState
+            onState: handleState,
         })
     ).language as Extension;
+
 
 const chooseStylesheet = async () =>
     (
@@ -81,9 +97,10 @@ const chooseStylesheet = async () =>
                 { title: 'sass', value: 'sass' },
             ],
             initial: 1,
-            onState: handleState
+            onState: handleState,
         })
     ).stylesheet as Extension;
+
 
 const chooseFilesToGenerate = async (language: Extension, stylesheet: Extension) =>
     (
@@ -94,19 +111,30 @@ const chooseFilesToGenerate = async (language: Extension, stylesheet: Extension)
             choices: [
                 { value: `${language}`, title: `Component file (.${language})`, selected: true },
                 { value: `${stylesheet}`, title: `Stylesheet (.${stylesheet})`, selected: true },
-                { value: `test.${language === 'jsx' ? 'js' : 'ts'}`, title: `Tests (.test.${language === 'jsx' ? 'js' : 'ts'})`, selected: true },
+                {
+                    value: `test.${language === 'jsx' ? 'js' : 'ts'}`,
+                    title: `Tests (.test.${language === 'jsx' ? 'js' : 'ts'})`,
+                    selected: true,
+                },
             ] as any[],
-            onState: handleState
+            onState: handleState,
         })
     ).filesToGenerate as Extension[];
 
-const writeFileByExtension = async (path: string, name: string, extension: Extension, createTemplates: boolean, stylesheet?: Extension) => {
+
+const writeFileByExtension = async (
+    path: string,
+    name: string,
+    extension: Extension,
+    createTemplates: boolean,
+    stylesheet?: Extension,
+) => {
     const outFile = join(path, `${name}.${extension}`);
-    
-    const boilerplate = createTemplates ? getBoilerplateByExtension(name, extension, stylesheet) : '';
+
+    const template = createTemplates ? getTemplateByExtension(name, extension, stylesheet) : '';
 
     try {
-        await writeFile(outFile, boilerplate, { flag: 'wx' });
+        await writeFile(outFile, template, { flag: 'wx' });
     } catch (exception) {
         console.error('An unexpected error occured while writing the files.', exception.message);
         exit(-1);
@@ -115,25 +143,28 @@ const writeFileByExtension = async (path: string, name: string, extension: Exten
     return outFile;
 };
 
-const getBoilerplateByExtension = (componentName: string, extension: Extension, stylesheet?: Extension) => {
+
+const getTemplateByExtension = (componentName: string, extension: Extension, stylesheet?: Extension) => {
     switch (extension) {
         case 'jsx':
-            return getComponentBoilerplate(componentName, stylesheet);
+            return getComponentTemplate(componentName, stylesheet);
         case 'tsx':
-            return getComponentBoilerplate(componentName, stylesheet);
+            return getComponentTemplate(componentName, stylesheet);
         case 'test.js':
-            return getTestBoilerplate(componentName);
+            return getTestTemplate(componentName);
         case 'test.ts':
-            return getTestBoilerplate(componentName);
+            return getTestTemplate(componentName);
         default:
             return '';
     }
 };
 
+
 const formatInput = (val: string) => {
     val = val.trim();
     return val.split(' ');
 };
+
 
 const handleState = (state: any) => {
     if (state.aborted) {
@@ -141,14 +172,19 @@ const handleState = (state: any) => {
     }
 };
 
-const validateInput = (input: string) => {
-    //TODO: check, if file already exists
-    if(input.trim() === '') {
-        return "Name of component may not be empty!";
+
+const validateInput = (input: string, outDir: string) => {
+    if (input.trim() === '') {
+        return 'Name of component may not be empty!';
     }
     const names: string[] = input.trim().split(' ');
     if (new Set(names).size !== names.length) {
-        return "Duplicates not allowed!";
+        return 'Duplicates not allowed!';
+    }
+    for (const name of names) {
+        if (fs.existsSync(path.join(outDir, name))) {
+            return 'Component already exists!';
+        }
     }
     return true;
 };
