@@ -3,6 +3,7 @@ import { join, parse, relative } from 'path';
 import { promisify } from 'util';
 import prompt from 'prompts';
 import exit from 'exit';
+import {getComponentBoilerplate, getTestBoilerplate} from "./boilerplates";
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
@@ -11,26 +12,29 @@ export async function generateReactComponent() {
     const name: string = (await prompt({ 
         name: 'componentName', 
         type: 'text', 
-        message: 'Component name:',
+        message: 'Enter component name:',
         validate: validateInput,
         onState: handleState
     })).componentName as string;
     
     const {dir, base: componentName} = parse(name);
 
-    const base: Extension = await chooseBase();
+    const language: Extension = await chooseLanguage();
 
     const stylesheet: Extension = await chooseStylesheet();
 
-    const filesToGenerate: Extension[] = [base, ...(await chooseFilesToGenerate(base === 'jsx' ? 'js' : 'ts', stylesheet))];
+    const filesToGenerate: Extension[] = [...(await chooseFilesToGenerate(language, stylesheet))];
+    
+    const stylesheetSelected: boolean = filesToGenerate.some((file: string) => {
+       return ( file === 'css' || file === 'scss' || file === 'sass');
+    });
     
     const outDir = join('components', dir, componentName);
     await mkdir(outDir, { recursive: true} );
-    
+
     const writtenFiles = await Promise.all(
-        filesToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension))
-    );
-    
+        filesToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, stylesheetSelected ? stylesheet : undefined)));
+        
     if (!writtenFiles) {
         return exit(-1);
     }
@@ -39,12 +43,27 @@ export async function generateReactComponent() {
     console.log(`The following files have been generated:`);
 }
 
+const chooseLanguage = async () =>
+    (
+        await prompt({
+            name: 'language',
+            type: 'select',
+            message: 'Select language',
+            choices: [
+                { title: 'JavaScript (.jsx)', value: 'jsx' },
+                { title: 'TypeScript (.tsx)', value: 'tsx' },
+            ],
+            initial: 1,
+            onState: handleState
+        })
+    ).language as Extension;
+
 const chooseStylesheet = async () =>
     (
         await prompt({
             name: 'stylesheet',
             type: 'select',
-            message: 'Pick stylesheet',
+            message: 'Select stylesheet language',
             choices: [
                 { title: 'css', value: 'css' },
                 { title: 'scss', value: 'scss' },
@@ -55,62 +74,42 @@ const chooseStylesheet = async () =>
         })
     ).stylesheet as Extension;
 
-const chooseBase = async () =>
-    (
-        await prompt({
-            name: 'base',
-            type: 'select',
-            message: 'Pick base',
-            choices: [
-                { title: 'jsx', value: 'jsx' },
-                { title: 'tsx', value: 'tsx' },
-            ],
-            initial: 1,
-            onState: handleState
-        })
-    ).base as Extension;
-
-const chooseFilesToGenerate = async (base: Extension, stylesheet: Extension) =>
+const chooseFilesToGenerate = async (language: Extension, stylesheet: Extension) =>
     (
         await prompt({
             name: 'filesToGenerate',
             type: 'multiselect',
             message: 'Which files would you like to generate?',
             choices: [
+                { value: `${language}`, title: `Component file (.${language})`, selected: true },
                 { value: `${stylesheet}`, title: `Stylesheet (.${stylesheet})`, selected: true },
-                { value: `test.${base}`, title: `Tests (.test.${base})`, selected: true },
+                { value: `test.${language === 'jsx' ? 'js' : 'ts'}`, title: `Tests (.test.${language === 'jsx' ? 'js' : 'ts'})`, selected: true },
             ] as any[],
             onState: handleState
         })
     ).filesToGenerate as Extension[];
 
-const writeFileByExtension = async (path: string, name: string, extension: Extension) => {
+const writeFileByExtension = async (path: string, name: string, extension: Extension,stylesheet?: Extension) => {
     const outFile = join(path, `${name}.${extension}`);
-    //const boilerplate = getBoilerplateByExtension(name, extension);
+    const boilerplate = getBoilerplateByExtension(name, extension, stylesheet);
 
-    await writeFile(outFile, { flag: 'wx' });
+    await writeFile(outFile, boilerplate, { flag: 'wx' });
 
     return outFile;
 };
 
-const getBoilerplateByExtension = (tagName: string, extension: Extension) => {
+const getBoilerplateByExtension = (componentName: string, extension: Extension, stylesheet?: Extension) => {
     switch (extension) {
         case 'jsx':
-            return;
+            return getComponentBoilerplate(componentName, stylesheet);
         case 'tsx':
-            return;
-        case 'css':
-            return;
-        case 'scss':
-            return;
-        case 'sass':
-            return;
-        case 'test.jsx':
-            return;
-        case 'test.tsx':
-            return;
+            return getComponentBoilerplate(componentName, stylesheet);
+        case 'test.js':
+            return getTestBoilerplate(componentName);
+        case 'test.ts':
+            return getTestBoilerplate(componentName);
         default:
-            throw new Error(`Unknown extension ${extension}`);
+            return '';
     }
 };
 
@@ -127,4 +126,4 @@ const validateInput = (input: string) => {
     return true;
 };
 
-type Extension = 'js' | 'jsx' | 'ts' | 'tsx' | 'css' | 'scss' | 'sass' | 'test.jsx' | 'test.tsx';
+export type Extension = 'js' | 'jsx' | 'ts' | 'tsx' | 'css' | 'scss' | 'sass' | 'test.js' | 'test.ts';
