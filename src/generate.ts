@@ -9,7 +9,7 @@ import {Option} from "commander";
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 
-export async function generateReactComponent(components: string[]) {
+export async function generateReactComponent(options: {[key: string]: any}, components: string[]) {
     
     if (components.length === 0) {
         components = (await prompt({
@@ -33,11 +33,13 @@ export async function generateReactComponent(components: string[]) {
     });
     
     for(let component of components) {
-        const outDir = join('components', component);
+        const componentName = component.trim();
+        const outDir = join('components', componentName);
         await mkdir(outDir, { recursive: true} );
+        const createTemplates = options['template'] !== undefined ? options['template'] : true;
 
         const writtenFiles = await Promise.all(
-            filesToGenerate.map(extension => writeFileByExtension(outDir, component, extension, stylesheetSelected ? stylesheet : undefined)));
+            filesToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, createTemplates, stylesheetSelected ? stylesheet : undefined)));
 
         if (!writtenFiles) {
             return exit(-1);
@@ -94,11 +96,17 @@ const chooseFilesToGenerate = async (language: Extension, stylesheet: Extension)
         })
     ).filesToGenerate as Extension[];
 
-const writeFileByExtension = async (path: string, name: string, extension: Extension,stylesheet?: Extension) => {
+const writeFileByExtension = async (path: string, name: string, extension: Extension, createTemplates: boolean, stylesheet?: Extension) => {
     const outFile = join(path, `${name}.${extension}`);
-    const boilerplate = getBoilerplateByExtension(name, extension, stylesheet);
+    
+    const boilerplate = createTemplates ? getBoilerplateByExtension(name, extension, stylesheet) : '';
 
-    await writeFile(outFile, boilerplate, { flag: 'wx' });
+    try {
+        await writeFile(outFile, boilerplate, { flag: 'wx' });
+    } catch (exception) {
+        console.error('An unexpected error occured while writing the files.', exception.message);
+        exit(-1);
+    }
 
     return outFile;
 };
@@ -119,6 +127,7 @@ const getBoilerplateByExtension = (componentName: string, extension: Extension, 
 };
 
 const formatInput = (val: string) => {
+    val = val.trim();
     return val.split(' ');
 };
 
@@ -129,7 +138,8 @@ const handleState = (state: any) => {
 };
 
 const validateInput = (input: string) => {
-    if(input === '') {
+    //TODO: check, if file already exists
+    if(input.trim() === '') {
         return "Name of component may not be empty!";
     }
     return true;

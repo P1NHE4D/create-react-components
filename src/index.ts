@@ -11,6 +11,6 @@ program
     .option('-p, --path <componentsPath>', 'specify components directory', '')
     .option('-t, --no-template', 'disable default component template')
     .action(async (components: string[]) => {
-        await generateReactComponent(components);
+        await generateReactComponent(program.opts(), components);
     })
     .parse(process.argv);
