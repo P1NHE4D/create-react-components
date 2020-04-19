@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import program from 'commander';
-import {buildReactComponent} from "./buildComponent";
+import { buildReactComponent } from './buildComponent';
 
 program
     .arguments('[components...]')

@@ -1,10 +1,10 @@
 import fs from 'graceful-fs';
-import path, { join, parse, relative } from 'path';
+import path, { join, relative } from 'path';
 import { promisify } from 'util';
 import prompt from 'prompts';
 import exit from 'exit';
 import { getComponentTemplate, getTestTemplate } from './template';
-import logSymbols from "log-symbols";
+import logSymbols from 'log-symbols';
 import { bold, red } from 'kleur';
 
 const writeFile = promisify(fs.writeFile);
@@ -56,17 +56,19 @@ export async function buildReactComponent(options: { [key: string]: any }, compo
 
         const createTemplates = options.template !== undefined ? options.template : true;
 
-        writtenFiles = writtenFiles.concat(await Promise.all(
-            filesToGenerate.map((extension) =>
-                writeFileByExtension(
-                    outDir,
-                    componentName,
-                    extension,
-                    createTemplates,
-                    stylesheetSelected ? stylesheet : undefined,
+        writtenFiles = writtenFiles.concat(
+            await Promise.all(
+                filesToGenerate.map((extension) =>
+                    writeFileByExtension(
+                        outDir,
+                        componentName,
+                        extension,
+                        createTemplates,
+                        stylesheetSelected ? stylesheet : undefined,
+                    ),
                 ),
             ),
-        ));
+        );
 
         if (!writtenFiles) {
             return exit(-1);
@@ -75,7 +77,7 @@ export async function buildReactComponent(options: { [key: string]: any }, compo
 
     console.log();
     console.log(logSymbols.info, bold('The following files have been generated:'));
-    writtenFiles.map(file => console.log(`- ${relative(dir, file)}`));
+    writtenFiles.map((file) => console.log(`- ${relative(dir, file)}`));
     console.log();
     console.log(logSymbols.success, bold('Done'));
 }
@@ -143,20 +145,23 @@ const chooseFilesToGenerate = async (language: Extension, stylesheet: Extension)
  * Parses the component template and writes the files to the disk
  */
 const writeFileByExtension = async (
-    path: string,
+    filePath: string,
     name: string,
     extension: Extension,
     createTemplates: boolean,
     stylesheet?: Extension,
 ) => {
-    const outFile = join(path, `${name}.${extension}`);
+    const outFile = join(filePath, `${name}.${extension}`);
 
     const template = createTemplates ? getTemplateByExtension(name, extension, stylesheet) : '';
 
     try {
         await writeFile(outFile, template, { flag: 'wx' });
     } catch (exception) {
-        console.error(logSymbols.error, bold().red(`An unexpected error occured while writing the files. ${exception.message}`));
+        console.error(
+            logSymbols.error,
+            bold().red(`An unexpected error occured while writing the files. ${exception.message}`),
+        );
         exit(-1);
     }
 
