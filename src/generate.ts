@@ -10,8 +10,13 @@ import { bold, red } from 'kleur';
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 
+/**
+ * Generates react component files
+ * @param options dictionary containing the arguments set by the user
+ * @param components component names provided by the user as an argument
+ */
 export async function generateReactComponent(options: { [key: string]: any }, components: string[]) {
-    const dir = 'components'; // TODO: set to user defined directory if set
+    const dir = options.path || 'components';
     if (components.length === 0) {
         components = (
             await prompt({
@@ -46,7 +51,7 @@ export async function generateReactComponent(options: { [key: string]: any }, co
     let writtenFiles: any[] = [];
     for (const component of components) {
         const componentName = component.trim();
-        const outDir = join('components', componentName);
+        const outDir = join(dir, componentName);
         await mkdir(outDir, { recursive: true });
 
         const createTemplates = options.template !== undefined ? options.template : true;
@@ -75,6 +80,9 @@ export async function generateReactComponent(options: { [key: string]: any }, co
     console.log(logSymbols.success, bold('Done'));
 }
 
+/**
+ * Displays a select prompt to choose the language used by the consumer
+ */
 const chooseLanguage = async () =>
     (
         await prompt({
@@ -90,6 +98,9 @@ const chooseLanguage = async () =>
         })
     ).language as Extension;
 
+/**
+ * Displays a select prompt to choose the stylesheet language used by the consumer
+ */
 const chooseStylesheet = async () =>
     (
         await prompt({
@@ -106,6 +117,9 @@ const chooseStylesheet = async () =>
         })
     ).stylesheet as Extension;
 
+/**
+ * Displays a multi-select prompt to allow the consumer to select/deselect files to be generated
+ */
 const chooseFilesToGenerate = async (language: Extension, stylesheet: Extension) =>
     (
         await prompt({
@@ -125,6 +139,9 @@ const chooseFilesToGenerate = async (language: Extension, stylesheet: Extension)
         })
     ).filesToGenerate as Extension[];
 
+/**
+ * Parses the component template and writes the files to the disk
+ */
 const writeFileByExtension = async (
     path: string,
     name: string,
@@ -146,6 +163,9 @@ const writeFileByExtension = async (
     return outFile;
 };
 
+/**
+ * Gets the template for the file based on its extension
+ */
 const getTemplateByExtension = (componentName: string, extension: Extension, stylesheet?: Extension) => {
     switch (extension) {
         case 'jsx':
@@ -161,17 +181,26 @@ const getTemplateByExtension = (componentName: string, extension: Extension, sty
     }
 };
 
+/**
+ * Removes leading and trailing whitespaces and converts input string to string array
+ */
 const formatInput = (val: string) => {
     val = val.trim();
     return val.split(' ');
 };
 
+/**
+ * Terminates script if user interrupted the execution
+ */
 const handleState = (state: any) => {
     if (state.aborted) {
         exit(-1);
     }
 };
 
+/**
+ * Validates the input passed by the user
+ */
 const validateInput = (input: string, outDir: string) => {
     if (input.trim() === '') {
         return 'Name of component may not be empty!';
