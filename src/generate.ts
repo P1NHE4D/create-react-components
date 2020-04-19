@@ -4,6 +4,8 @@ import { promisify } from 'util';
 import prompt from 'prompts';
 import exit from 'exit';
 import { getComponentTemplate, getTestTemplate } from './template';
+import logSymbols from "log-symbols";
+import { bold, red } from 'kleur';
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
@@ -41,6 +43,7 @@ export async function generateReactComponent(options: { [key: string]: any }, co
         return file === 'css' || file === 'scss' || file === 'sass';
     });
 
+    let writtenFiles: any[] = [];
     for (const component of components) {
         const componentName = component.trim();
         const outDir = join('components', componentName);
@@ -48,7 +51,7 @@ export async function generateReactComponent(options: { [key: string]: any }, co
 
         const createTemplates = options.template !== undefined ? options.template : true;
 
-        const writtenFiles = await Promise.all(
+        writtenFiles = writtenFiles.concat(await Promise.all(
             filesToGenerate.map((extension) =>
                 writeFileByExtension(
                     outDir,
@@ -58,14 +61,18 @@ export async function generateReactComponent(options: { [key: string]: any }, co
                     stylesheetSelected ? stylesheet : undefined,
                 ),
             ),
-        );
+        ));
 
         if (!writtenFiles) {
             return exit(-1);
         }
     }
 
-    console.log(`\nThe following files have been generated:`);
+    console.log();
+    console.log(logSymbols.info, bold('The following files have been generated:'));
+    writtenFiles.map(file => console.log(`- ${relative(dir, file)}`));
+    console.log();
+    console.log(logSymbols.success, bold('Done'));
 }
 
 const chooseLanguage = async () =>
@@ -132,7 +139,7 @@ const writeFileByExtension = async (
     try {
         await writeFile(outFile, template, { flag: 'wx' });
     } catch (exception) {
-        console.error('An unexpected error occured while writing the files.', exception.message);
+        console.error(logSymbols.error, bold().red(`An unexpected error occured while writing the files. ${exception.message}`));
         exit(-1);
     }
 
