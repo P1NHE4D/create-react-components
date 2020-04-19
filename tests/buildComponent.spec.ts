@@ -53,6 +53,18 @@ describe('Build React Component', () => {
         }
     });
     
+    it('should generate components passed by user as argument', async () => {
+        const components = ['Menu', 'Button', 'Slider'];
+        const extensions = ['tsx, scss, test.ts'];
+
+        prompts.inject(['tsx', 'scss', extensions]);
+        await buildReactComponent(options, components);
+
+        const filePaths: string[] = await getFilePaths(components, extensions);
+        for(const file of filePaths) {
+            expect(fs.existsSync(file)).toBeTruthy();
+        }
+    });
     
     it('should not generate any files', async () => {
         const components = 'Menu Button Slider';
