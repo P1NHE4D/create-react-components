@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import program from 'commander';
-import {generateReactComponent} from "./generate";
+import {buildReactComponent} from "./buildComponent";
 
 program
     .arguments('[components...]')
@@ -10,6 +10,6 @@ program
     .option('-p, --path <componentsPath>', 'specify components directory')
     .option('-t, --no-template', 'disable default component template')
     .action(async (components: string[]) => {
-        await generateReactComponent(program.opts(), components);
+        await buildReactComponent(program.opts(), components);
     })
     .parse(process.argv);
