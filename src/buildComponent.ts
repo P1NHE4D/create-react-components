@@ -15,7 +15,7 @@ const mkdir = promisify(fs.mkdir);
  * @param options dictionary containing the arguments set by the user
  * @param components component names provided by the user as an argument
  */
-export async function generateReactComponent(options: { [key: string]: any }, components: string[]) {
+export async function buildReactComponent(options: { [key: string]: any }, components: string[]) {
     const dir = options.path || 'components';
     if (components.length === 0) {
         components = (
