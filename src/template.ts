@@ -20,7 +20,10 @@ export class ${componentName} extends React.Component<${componentName}Props, ${c
 
 `;
 
-export const getFunctionalTsxTemplate = (componentName: string, stylesheet?: Extension) => `import * as React from "react";
+export const getFunctionalTsxTemplate = (
+    componentName: string,
+    stylesheet?: Extension,
+) => `import * as React from "react";
 ${stylesheet ? `import \'./${componentName}.${stylesheet}\';` : ''}
 
 type ${componentName}Props = {};

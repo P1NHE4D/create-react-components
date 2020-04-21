@@ -7,7 +7,8 @@ import {
     getFunctionalJsxTemplate,
     getFunctionalTsxTemplate,
     getJsxTemplate,
-    getTestTemplate, getTsxTemplate
+    getTestTemplate,
+    getTsxTemplate,
 } from './template';
 import logSymbols from 'log-symbols';
 import { bold, red } from 'kleur';
@@ -179,12 +180,21 @@ const writeFileByExtension = async (
 /**
  * Gets the template for the file based on its extension
  */
-const getTemplateByExtension = (componentName: string, extension: Extension, functionalComponent: boolean, stylesheet?: Extension) => {
+const getTemplateByExtension = (
+    componentName: string,
+    extension: Extension,
+    functionalComponent: boolean,
+    stylesheet?: Extension,
+) => {
     switch (extension) {
         case 'jsx':
-            return functionalComponent ? getFunctionalJsxTemplate(componentName, stylesheet) : getJsxTemplate(componentName, stylesheet);
+            return functionalComponent
+                ? getFunctionalJsxTemplate(componentName, stylesheet)
+                : getJsxTemplate(componentName, stylesheet);
         case 'tsx':
-            return functionalComponent ? getFunctionalTsxTemplate(componentName, stylesheet) : getTsxTemplate(componentName, stylesheet);
+            return functionalComponent
+                ? getFunctionalTsxTemplate(componentName, stylesheet)
+                : getTsxTemplate(componentName, stylesheet);
         case 'test.js':
             return getTestTemplate(componentName);
         case 'test.ts':
