@@ -1,6 +1,6 @@
-# create-react-components
+# generate-react-component
 
- create-react-components allows you to easily build (multiple) react
+ generate-react-component allows you to easily build (multiple) react
  components.
  
  ## Contents
@@ -11,7 +11,7 @@
  
  ## Introduction
  
- Inspired by [stencil](http://stenciljs.com/)'s component generator, create-react-components is a CLI application
+ Inspired by [stencil](http://stenciljs.com/)'s component generator, generate-react-component is a CLI application
  for generating (multiple) react components. It is designed to be easy to use while providing a great set of features,
  including:
 
@@ -24,15 +24,15 @@
 
 ### Installation
 
-Install `create-react-components` globally:
+Install `generate-react-component` globally:
 
 ```bash
-npm i -g create-react-components
+npm i -g generate-react-component
 ```
 
 ### Usage
 
-1. Execute `create-react-components`
+1. Execute `generate-react-component`
 
 2. Insert component names
 
@@ -52,7 +52,7 @@ npm i -g create-react-components
 
 You can also provide the name of the components as an argument:
 ```bash
-create-react-components Slider Button Menu Switch
+generate-react-component Slider Button Menu Switch
 ```
 
 ## Arguments

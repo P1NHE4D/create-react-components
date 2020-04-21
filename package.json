@@ -1,11 +1,11 @@
 {
-  "name": "create-react-components",
+  "name": "generate-react-component",
   "version": "1.0.0",
   "description": "Allows you to easily generate new react components. Features: - Typescript and Javascript support - SCSS, SASS, and CSS support - Multiple component generation",
   "main": "./src/index.js",
   "types": "./lib/index.d.ts",
   "bin": {
-    "create-react-components": "./lib/index.js"
+    "generate-react-component": "./lib/index.js"
   },
   "scripts": {
     "build": "tsc",
