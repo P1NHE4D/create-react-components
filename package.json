@@ -1,10 +1,10 @@
 {
-  "name": "react-component-generator",
+  "name": "create-react-components",
   "version": "1.0.0",
   "description": "Allows you to easily generate new react components. Features: - Typescript and Javascript support - SCSS, SASS, and CSS support - Multiple component generation - Support for custom component templates",
   "main": "./src/index.js",
   "bin": {
-    "build-react-component": "./lib/index.js"
+    "create-react-components": "./lib/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -28,7 +28,10 @@
   "keywords": [
     "react",
     "generate",
-    "component"
+    "component",
+    "create",
+    "typescript",
+    "javascript"
   ],
   "author": "Alexander Gerlach",
   "license": "ISC",
@@ -37,10 +40,10 @@
   },
   "homepage": "https://github.com/P1NHE4D/build-react-component.git",
   "dependencies": {
-    "log-symbols": "^3.0.0",
     "commander": "^5.0.0",
     "exit": "^0.1.2",
     "graceful-fs": "^4.2.3",
+    "log-symbols": "^3.0.0",
     "prompts": "^2.3.2"
   },
   "devDependencies": {
