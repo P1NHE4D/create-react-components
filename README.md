@@ -3,13 +3,13 @@
  generate-react-components allows you to easily generate (multiple) react
  components.
  
- ## Contents
+## Contents
  
  * [Introduction](#introduction)
  * [Getting started](#getting-started)
  * [Arguments](#arguments)
  
- ## Introduction
+## Introduction
  
  Inspired by [stencil](http://stenciljs.com/)'s component generator, generate-react-components is a CLI application
  for generating (multiple) react components. It is designed to be easy to use while providing a great set of features,
