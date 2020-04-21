@@ -1,6 +1,6 @@
 # generate-react-component
 
- generate-react-component allows you to easily build (multiple) react
+ generate-react-component allows you to easily generate (multiple) react
  components.
  
  ## Contents
