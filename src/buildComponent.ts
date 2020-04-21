@@ -3,7 +3,12 @@ import path, { join, relative } from 'path';
 import { promisify } from 'util';
 import prompt from 'prompts';
 import exit from 'exit';
-import { getComponentTemplate, getTestTemplate } from './template';
+import {
+    getFunctionalJsxTemplate,
+    getFunctionalTsxTemplate,
+    getJsxTemplate,
+    getTestTemplate, getTsxTemplate
+} from './template';
 import logSymbols from 'log-symbols';
 import { bold, red } from 'kleur';
 
@@ -54,7 +59,8 @@ export async function buildReactComponent(options: { [key: string]: any }, compo
         const outDir = join(dir, componentName);
         await mkdir(outDir, { recursive: true });
 
-        const createTemplates = options.template !== undefined ? options.template : true;
+        const createTemplates = options.template;
+        const functionalComponent = options.functional;
 
         writtenFiles = writtenFiles.concat(
             await Promise.all(
@@ -64,6 +70,7 @@ export async function buildReactComponent(options: { [key: string]: any }, compo
                         componentName,
                         extension,
                         createTemplates,
+                        functionalComponent,
                         stylesheetSelected ? stylesheet : undefined,
                     ),
                 ),
@@ -149,11 +156,12 @@ const writeFileByExtension = async (
     name: string,
     extension: Extension,
     createTemplates: boolean,
+    functionalComponent: boolean,
     stylesheet?: Extension,
 ) => {
     const outFile = join(filePath, `${name}.${extension}`);
 
-    const template = createTemplates ? getTemplateByExtension(name, extension, stylesheet) : '';
+    const template = createTemplates ? getTemplateByExtension(name, extension, functionalComponent, stylesheet) : '';
 
     try {
         await writeFile(outFile, template, { flag: 'wx' });
@@ -171,12 +179,12 @@ const writeFileByExtension = async (
 /**
  * Gets the template for the file based on its extension
  */
-const getTemplateByExtension = (componentName: string, extension: Extension, stylesheet?: Extension) => {
+const getTemplateByExtension = (componentName: string, extension: Extension, functionalComponent: boolean, stylesheet?: Extension) => {
     switch (extension) {
         case 'jsx':
-            return getComponentTemplate(componentName, stylesheet);
+            return functionalComponent ? getFunctionalJsxTemplate(componentName, stylesheet) : getJsxTemplate(componentName, stylesheet);
         case 'tsx':
-            return getComponentTemplate(componentName, stylesheet);
+            return functionalComponent ? getFunctionalTsxTemplate(componentName, stylesheet) : getTsxTemplate(componentName, stylesheet);
         case 'test.js':
             return getTestTemplate(componentName);
         case 'test.ts':

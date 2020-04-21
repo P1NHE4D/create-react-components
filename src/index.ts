@@ -9,6 +9,7 @@ program
     .description('Easily generate react components')
     .option('-p, --path <componentsPath>', 'specify components directory')
     .option('-t, --no-template', 'disable default component template')
+    .option('-f --functional', 'enable functional component generation', false)
     .action(async (components: string[]) => {
         await buildReactComponent(program.opts(), components);
     })
