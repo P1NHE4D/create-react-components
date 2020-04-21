@@ -5,7 +5,9 @@
  
  ## Contents
  
- 
+ * [Introduction](#introduction)
+ * [Getting started](#getting-started)
+ * [Arguments](#arguments)
  
  ## Introduction
  
