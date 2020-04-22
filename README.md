@@ -24,15 +24,20 @@
 
 ### Installation
 
-Install `generate-react-components` globally:
+Install `generate-react-components` globally
 
 ```bash
 npm i -g generate-react-components
 ```
 
+or locally
+```bash
+npm i generate-react-components
+```
+
 ### Usage
 
-1. Execute `generate-react-components`
+1. Execute `generate-react-components` or if installed locally `npx generate-react-components`
 
 2. Insert component names
 

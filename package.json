@@ -24,7 +24,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/P1NHE4D/build-react-component.git"
+    "url": "https://github.com/P1NHE4D/generate-react-components"
   },
   "keywords": [
     "react",
@@ -37,9 +37,9 @@
   "author": "Alexander Gerlach",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/P1NHE4D/build-react-component.git"
+    "url": "https://github.com/P1NHE4D/generate-react-components"
   },
-  "homepage": "https://github.com/P1NHE4D/build-react-component.git",
+  "homepage": "https://github.com/P1NHE4D/generate-react-components",
   "dependencies": {
     "commander": "^5.0.0",
     "exit": "^0.1.2",
