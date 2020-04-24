@@ -12,7 +12,7 @@
     "clean": "rm -rf ./node_modules ./package-lock.json",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "test": "jest --config jestconfig.json",
+    "test": "jest --silent --config jestconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
     "preversion": "npm run lint",

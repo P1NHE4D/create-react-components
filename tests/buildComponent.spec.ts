@@ -1,6 +1,8 @@
 import '../src/buildComponent';
 import * as path from "path";
 import {buildReactComponent} from "../src/buildComponent";
+import {getFunctionalJsxTemplate, getFunctionalTsxTemplate, getJsxTemplate, getTsxTemplate} from "../src/template";
+import ErrnoException = NodeJS.ErrnoException;
 const fs = require('fs-extra');
 const prompts = require('prompts');
 const mock = require('mock-fs');
@@ -49,7 +51,8 @@ describe('Build React Component', () => {
         
         const filePaths: string[] = await getFilePaths(components.split(" "), extensions);
         for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeTruthy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
         }
     });
     
@@ -62,7 +65,8 @@ describe('Build React Component', () => {
 
         const filePaths: string[] = await getFilePaths(components, extensions);
         for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeTruthy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
         }
     });
     
@@ -75,7 +79,8 @@ describe('Build React Component', () => {
 
         const filePaths: string[] = await getFilePaths(components.split(" "), extensions);
         for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeFalsy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeFalsy();
         }
     });
     
@@ -92,10 +97,126 @@ describe('Build React Component', () => {
         await buildReactComponent(options, []);
 
         const filePaths: string[] = await getFilePaths([component], extensions);
-        for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeTruthy();
-            expect(fs.readFileSync(file).toString().trim()).toBe('');
+        for(const file of filePaths) {        
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
+            await fs.readFile(file, 'utf8', ((err: ErrnoException | null, data: string) => {
+                expect(err).toBeNull();
+                expect(data).toBe('');
+            }));
         }
+    });
+
+    it('should create files with tsx template', async () => {
+        const options = {
+            'template': true,
+            'path': dir,
+            'functional': false
+        };
+
+        const component = "TestComponent";
+        const extensions = ['tsx', 'css'];
+        const template = await getTsxTemplate(component, 'css');
+
+        prompts.inject([component, 'tsx', 'css', extensions]);
+        await buildReactComponent(options, []);
+        
+        const componentPath = path.join(dir, component, component.concat(`.tsx`));
+        const stylesheetPath = path.join(dir, component, component.concat(`.css`));
+        
+        let pathExists = await fs.pathExists(componentPath);
+        expect(pathExists).toBeTruthy();
+        pathExists = await fs.pathExists(stylesheetPath);
+        expect(pathExists).toBeTruthy();
+        
+        await fs.readFile(componentPath, 'utf8', ((err: ErrnoException | null, data: string) => {
+            expect(err).toBeNull();
+            expect(data).toBe(template);
+        }));
+    });
+
+    it('should create files with jsx template', async () => {
+        const options = {
+            'template': true,
+            'path': dir,
+            'functional': false
+        };
+
+        const component = "TestComponent";
+        const extensions = ['jsx', 'css'];
+        const template = await getJsxTemplate(component, 'css');
+
+        prompts.inject([component, 'jsx', 'css', extensions]);
+        await buildReactComponent(options, []);
+
+        const componentPath = path.join(dir, component, component.concat(`.jsx`));
+        const stylesheetPath = path.join(dir, component, component.concat(`.css`));
+
+        let pathExists = await fs.pathExists(componentPath);
+        expect(pathExists).toBeTruthy();
+        pathExists = await fs.pathExists(stylesheetPath);
+        expect(pathExists).toBeTruthy();
+
+        await fs.readFile(componentPath, 'utf8', ((err: ErrnoException | null, data: string) => {
+            expect(err).toBeNull();
+            expect(data).toBe(template);
+        }));
+    });
+    
+    it('should create files with functional tsx template', async () => {
+        const options = {
+            'template': true,
+            'path': dir,
+            'functional': true
+        };
+
+        const component = "TestComponent";
+        const extensions = ['tsx', 'css'];
+        const template = await getFunctionalTsxTemplate(component, 'css');
+
+        prompts.inject([component, 'tsx', 'css', extensions]);
+        await buildReactComponent(options, []);
+
+        const componentPath = path.join(dir, component, component.concat(`.tsx`));
+        const stylesheetPath = path.join(dir, component, component.concat(`.css`));
+
+        let pathExists = await fs.pathExists(componentPath);
+        expect(pathExists).toBeTruthy();
+        pathExists = await fs.pathExists(stylesheetPath);
+        expect(pathExists).toBeTruthy();
+
+        await fs.readFile(componentPath, 'utf8', ((err: ErrnoException | null, data: string) => {
+            expect(err).toBeNull();
+            expect(data).toBe(template);
+        }));
+    });
+
+    it('should create files with functional jsx template', async () => {
+        const options = {
+            'template': true,
+            'path': dir,
+            'functional': true
+        };
+
+        const component = "TestComponent";
+        const extensions = ['jsx', 'css'];
+        const template = await getFunctionalJsxTemplate(component, 'css');
+
+        prompts.inject([component, 'jsx', 'css', extensions]);
+        await buildReactComponent(options, []);
+
+        const componentPath = path.join(dir, component, component.concat(`.jsx`));
+        const stylesheetPath = path.join(dir, component, component.concat(`.css`));
+
+        let pathExists = await fs.pathExists(componentPath);
+        expect(pathExists).toBeTruthy();
+        pathExists = await fs.pathExists(stylesheetPath);
+        expect(pathExists).toBeTruthy();
+
+        await fs.readFile(componentPath, 'utf8', ((err: ErrnoException | null, data: string) => {
+            expect(err).toBeNull();
+            expect(data).toBe(template);
+        }));
     });
     
     it('should generate jsx files', async () => {
@@ -107,7 +228,8 @@ describe('Build React Component', () => {
 
         const filePaths: string[] = await getFilePaths([component], extensions);
         for(const file of filePaths) {
-            expect(await fs.pathExists(file)).toBeTruthy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
         }
     });
     
@@ -121,7 +243,8 @@ describe('Build React Component', () => {
 
         const filePaths: string[] = await getFilePaths([component], extensions);
         for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeTruthy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
         }
     });
     
@@ -134,7 +257,8 @@ describe('Build React Component', () => {
 
         const filePaths: string[] = await getFilePaths([component], extensions);
         for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeTruthy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
         }
     });
     
@@ -147,7 +271,8 @@ describe('Build React Component', () => {
 
         const filePaths: string[] = await getFilePaths([component], extensions);
         for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeTruthy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
         }
     });
     
@@ -160,9 +285,11 @@ describe('Build React Component', () => {
 
         const filePaths: string[] = await getFilePaths([component], extensions);
         for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeTruthy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
         }
-        expect(fs.existsSync(path.join(dir, `${component}.test.ts`))).toBeFalsy();
+        const pathExists = await fs.pathExists(path.join(dir, `${component}.test.ts`));
+        expect(pathExists).toBeFalsy();
     });
     
     it('should not generate stylesheets', async () => {
@@ -174,9 +301,11 @@ describe('Build React Component', () => {
 
         const filePaths: string[] = await getFilePaths([component], extensions);
         for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeTruthy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
         }
-        expect(fs.existsSync(path.join(dir, `${component}.css`))).toBeFalsy();
+        const pathExists = await fs.pathExists(path.join(dir, `${component}.css`));
+        expect(pathExists).toBeFalsy();
     });
     
     it('should not generate the component file', async () => {
@@ -188,8 +317,10 @@ describe('Build React Component', () => {
 
         const filePaths: string[] = await getFilePaths([component], extensions);
         for(const file of filePaths) {
-            expect(fs.existsSync(file)).toBeTruthy();
+            const pathExists = await fs.pathExists(file);
+            expect(pathExists).toBeTruthy();
         }
-        expect(fs.existsSync(path.join(dir, `${component}.tsx`))).toBeFalsy();
+        const pathExists = await fs.pathExists(path.join(dir, `${component}.tsx`));
+        expect(pathExists).toBeFalsy();
     });
 });
