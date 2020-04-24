@@ -41,19 +41,19 @@ npm i generate-react-components
 
 2. Insert component names
 
-![Alt names](https://raw.githubusercontent.com/P1NHE4D/create-react-components/master/media/names.gif)
+    ![Alt names](https://raw.githubusercontent.com/P1NHE4D/create-react-components/master/media/names.gif)
 
 3. Select language
 
-![Alt language](https://raw.githubusercontent.com/P1NHE4D/create-react-components/master/media/language.gif)
+    ![Alt language](https://raw.githubusercontent.com/P1NHE4D/create-react-components/master/media/language.gif)
 
 4. Select stylesheet language
 
-![Alt stylesheet](https://raw.githubusercontent.com/P1NHE4D/create-react-components/master/media/stylesheet.gif)
+    ![Alt stylesheet](https://raw.githubusercontent.com/P1NHE4D/create-react-components/master/media/stylesheet.gif)
 
 5. Select files to generate
 
-![Alt selection](https://raw.githubusercontent.com/P1NHE4D/create-react-components/master/media/selection.gif)
+    ![Alt selection](https://raw.githubusercontent.com/P1NHE4D/create-react-components/master/media/selection.gif)
 
 You can also provide the name of the components as an argument:
 ```bash
@@ -64,7 +64,7 @@ generate-react-components Slider Button Menu Switch
 
 | Short flag | Long flag             | Description                  |
 | :--------: | :--------------------:| :--------------------------: |
-| -f         | --functional-template | Enable functional templates  |
-| -p         | --path                | Specify components directory |
+| -f         | --functional          | Enable functional templates  |
+| -p         | --path <path/to/dir>  | Specify components directory |
 | -t         | --no-template         | Disable templates            |
 
