@@ -1,6 +1,6 @@
 {
   "name": "generate-react-components",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Allows you to easily generate new react components. Features: - Typescript and Javascript support - SCSS, SASS, and CSS support - Multiple component generation",
   "main": "./src/index.js",
   "types": "./lib/index.d.ts",
@@ -41,28 +41,28 @@
   },
   "homepage": "https://github.com/P1NHE4D/generate-react-components",
   "dependencies": {
-    "commander": "^5.0.0",
+    "commander": "^5.1.0",
     "exit": "^0.1.2",
-    "graceful-fs": "^4.2.3",
+    "graceful-fs": "^4.2.4",
     "log-symbols": "^3.0.0",
     "prompts": "^2.3.2"
   },
   "devDependencies": {
     "@types/exit": "^0.1.31",
     "@types/graceful-fs": "^4.1.3",
-    "@types/jest": "^25.2.1",
-    "@types/node": "^13.11.1",
-    "@types/prompts": "^2.0.5",
-    "fs-extra": "^9.0.0",
+    "@types/jest": "^25.2.3",
+    "@types/node": "^13.13.15",
+    "@types/prompts": "^2.0.8",
+    "fs-extra": "^9.0.1",
     "generate-changelog": "^1.8.0",
-    "jest": "^25.3.0",
+    "jest": "^25.5.4",
     "kleur": "^3.0.3",
-    "mock-fs": "^4.11.0",
-    "prettier": "^2.0.4",
-    "ts-jest": "^25.4.0",
-    "ts-node": "^8.8.2",
-    "tslint": "^6.1.1",
+    "mock-fs": "^4.12.0",
+    "prettier": "^2.0.5",
+    "ts-jest": "^25.5.1",
+    "ts-node": "^8.10.2",
+    "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.7"
   }
 }
