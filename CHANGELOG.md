@@ -1,3 +1,9 @@
+#### 1.0.7 (2020-09-21)
+
+##### Chores
+
+*  update outdated packages ([73921776](https://github.com/P1NHE4D/generate-react-components/commit/739217767cd03ee02fff6c7406689fcb533ce226))
+
 #### 1.0.6 (2020-09-01)
 
 ##### Chores
