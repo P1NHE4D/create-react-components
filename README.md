@@ -1,3 +1,5 @@
+ ### ⚠️ This project will no longer be updated! ⚠️
+ 
 # generate-react-components
 
  generate-react-components allows you to easily generate (multiple) react
